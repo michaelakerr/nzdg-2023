@@ -4,18 +4,71 @@ from bs4 import BeautifulSoup
 
 # Player contains these fields
 # df = df[['PDGA#', 'Name', 'Div', 'Par', "Group", 'Rank', 'Points']]
+map_tour_divisions = {
+    "MPO": "Open - Mixed",
+    "MP40": "Pro Masters - Mixed",
+    "MP50": "Pro Masters - Mixed",
+    "MA1": "Advanced - Mixed",
+    "MA2": "Intermediate - Mixed",
+    "MA3": "Intermediate - Mixed",
+    "MA4": "Intermediate - Mixed",
+    "MA40": "Amateur Masters - Mixed",
+    "MA50": "Amateur Grand Masters - Mixed",
+    "MA60": "Senior Grand Masters - Mixed",
+    "MP60": "Senior Grand Masters - Mixed",
+    "MP70": "Legends - Mixed",
+    "MA70": "Legends - Mixed",
+    "MJ18": "Juniors - Mixed",
+    "MJ15": "Juniors - Mixed",
+    "MJ12": "Juniors - Mixed",
+    "MJ10": "Juniors - Mixed",
+    "MJ08": "Juniors - Mixed",
+    "MJ06": "Juniors - Mixed",
+    "FPO": "Open - Women",
+    "FP40": "Masters - Women",
+    "FP50": "Grand Masters - Women",
+    "FA1": "Advanced - Women",
+    "FA2": "Advanced - Women",
+    "FA3": "Advanced - Women",
+    "FA4": "Advanced - Women",
+    "FA40": "Masters - Women",
+    "FA50": "Grand Masters - Women",
+    "FA60": "Senior Grand Masters - Women",
+    "FP60": "Senior Grand Masters - Women",
+    "FP70": "Legends - Women",
+    "FA70": "Legends - Women",
+    "FJ18": "Juniors- Women",
+    "FJ15": "Juniors - Women",
+    "FJ12": "Juniors - Women",
+    "FJ10": "Juniors - Women",
+    "FJ08": "Juniors - Women",
+    "FJ06": "Juniors - Women",
+}
+
+
+def get_total_points(db, player):
+    tournament_keys = db.collection('tournaments').get()
+    tournaments = tournament_keys.to_dict()
+    print(tournaments)
+    total = 0
+    for t in tournaments:
+        if player[t]:
+            total = total + player[t]
+    print(total)
+    return total
 
 
 def create_player(db, tournament, player):
-    key = str(player["PDGA#"]) + "_" + \
+    key = str(player["PDGA#"]).strip(".0") + "_" + \
         player['Name'].strip(" ") + "_"+str(player["Group"])
     doc_ref = db.collection('players').document(key)
 
     doc = doc_ref.get()
     if doc.exists:
         player_info = doc.to_dict()
+        total_points = get_total_points(db, player_info)
         doc_ref.set({
-            "total": float(player_info["total"]) + float(player["Points"]),
+            "total": total_points,
             str(tournament): player["Points"]
         }, merge=True)
         print(f'Player data: {doc.to_dict()}')
@@ -26,6 +79,8 @@ def create_player(db, tournament, player):
             "name": player['Name'],
             "pdga_number": player['PDGA#'],
             "key": key,
+            "group": player["Group"],
+            "tour_division": map_tour_divisions[player['Div']],
             "scoring_group": player["Group"],
             "total": player["Points"],
             str(tournament): player["Points"]

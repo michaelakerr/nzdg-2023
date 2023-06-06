@@ -22,58 +22,46 @@ config = {
     )
 }
 
+map_tour_groups = {
+    "Open - Mixed": ['MPO'],
+    "Pro Masters - Mixed": ['MP40', 'MP50'],
+    "Advanced - Mixed": ['MA1'],
+    "Intermediate - Mixed": ['MA2', 'MA3', 'MA4'],
+    "Amateur Masters - Mixed": ['MA40'],
+    "Amateur Grand Masters - Mixed": ['MA50'],
+    "Senior Grand Masters - Mixed": ['MA60', "MP60"],
+    "Legends - Mixed": ['MA70', "MP70"],
+    "Juniors - Mixed": ["MJ18", "MJ15", "MJ12", "MJ10", "MJ08", "MJ06"],
+    "Open - Women": ['FPO'],
+    "Advanced - Women": ['FA1', "FA2", "FA3", "FA4"],
+    "Masters - Women": ['FP40', "FA40"],
+    "Grand Masters - Women": ["FA50", "FP50"],
+    "Senior Grand Masters - Women": ["FA60", "FP60"],
+    "Legends - Women": ["FA70", "FP70"],
+    "Juniors - Women": ["FJ18", "FJ15", "FJ12", "FJ10", "FJ08", "FJ06"],
+}
+
 
 def display_results(scoring_group):
     users_dict = list(map(lambda x: x.to_dict(), scoring_group))
     df = pd.DataFrame(users_dict)
-    df = df.drop(['key', 'scoring_group'], axis=1)
-
-    cols = ['pdga_number', 'name', 'total']
-    df = df[cols + [c for c in df.columns if c not in cols]]
+    df = df.drop(['key', 'scoring_group',
+                 'group', 'tour_division'], axis=1)
 
     df = df.sort_values(by="total", ascending=False)
+    df['Place'] = df['total'].rank(ascending=False, method="min")
+
+    cols = ['Place', 'pdga_number', 'name', 'total']
+    df = df[cols + [c for c in df.columns if c not in cols]]
     return df
 
 
 # SCORING GROUP 1
-st.subheader("Scoring Group 1: MPO")
-scoring_group_1 = list(db.collection('players').where(
-    'scoring_group', '==', 1).stream())
-
-df1 = display_results(scoring_group_1)
-st.dataframe(df1, hide_index=True, column_config=config)
-
-st.subheader("Scoring Group 2: MP40, MP50")
-scoring_group_2 = list(db.collection('players').where(
-    'scoring_group', '==', 2).stream())
-
-df2 = display_results(scoring_group_2)
-st.dataframe(df2, hide_index=True, column_config=config)
-
-st.subheader("Scoring Group 3: FPO, MA1")
-scoring_group_3 = list(db.collection('players').where(
-    'scoring_group', '==', 3).stream())
-
-df3 = display_results(scoring_group_3)
-st.dataframe(df3, hide_index=True, column_config=config)
-
-st.subheader("Scoring Group 4: MA40, MA50")
-scoring_group_4 = list(db.collection('players').where(
-    'scoring_group', '==', 4).stream())
-
-df4 = display_results(scoring_group_4)
-st.dataframe(df4, hide_index=True, column_config=config)
-
-st.subheader("Scoring Group 5: MA2")
-scoring_group_5 = list(db.collection('players').where(
-    'scoring_group', '==', 5).stream())
-
-df5 = display_results(scoring_group_5)
-st.dataframe(df5, hide_index=True, column_config=config)
-
-st.subheader("Scoring Group 6: All Other Divisions")
-scoring_group_6 = list(db.collection('players').where(
-    'scoring_group', '==', 6).stream())
-
-df6 = display_results(scoring_group_6)
-st.dataframe(df6, hide_index=True, column_config=config)
+for group in map_tour_groups:
+    score_list = list(db.collection('players').where(
+        'tour_division', '==', group).stream())
+    if len(score_list) > 0:
+        df6 = display_results(score_list)
+        st.subheader(group)
+        st.caption(', '.join(map_tour_groups[group]))
+        st.dataframe(df6, hide_index=True, column_config=config)
