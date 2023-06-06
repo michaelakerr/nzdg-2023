@@ -1,2 +1,4 @@
 secrets.toml
 nzdg-tour-2023-firebase-adminsdk-1iprr-78dd456e51.json
+toml_secrets_converter.py
+__pycache__

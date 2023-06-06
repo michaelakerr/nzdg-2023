@@ -1,3 +1,8 @@
 streamlit
 google-cloud-firestore
 google-auth-oauthlib
+streamlit_authenticator
+bs4
+requests
+pandas
+lxml
