@@ -47,15 +47,11 @@ map_tour_divisions = {
 
 
 def get_total_points(db, player):
-    tournament_keys = db.collection('tournaments').get()
-    print(tournament_keys)
-    tournaments = tournament_keys.to_dict()
-    print(tournaments)
+    tournaments = db.collection('tournaments').stream()
     total = 0
     for t in tournaments:
-        if player[t]:
-            total = total + player[t]
-    print(total)
+        if str(t.id) in player:
+            total = total + player[t.id]
     return total
 
 
@@ -63,9 +59,7 @@ def create_player(db, tournament, player):
     key = str(player["PDGA#"]).strip(".0") + "_" + \
         player['Name'].replace(" ", "") + "_"+str(player["Group"])
     doc_ref = db.collection('players').document(key)
-
     doc = doc_ref.get()
-    print(doc.exists)
     if doc.exists:
         player_info = doc.to_dict()
         total_points = get_total_points(db, player_info)
@@ -146,7 +140,6 @@ def create_players_and_points(tournament_name, url, tour_points):
 
     df['Points'] = df.apply(lambda x: 1+(tour_points-1)*(count_players_in_divs[x['Group']
                                                                                ]-x['Rank'])/(count_players_in_divs[x['Group']]-1), axis=1)
-    print(df)
 
     # rearrange columns
     df = df[['PDGA#', 'Name', 'Div', 'Par', 'Group', 'Rank', 'Points']]
