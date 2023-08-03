@@ -3,7 +3,9 @@ import json
 import pandas as pd
 import streamlit as st
 from google.cloud import firestore
+from google.cloud.firestore_v1.base_query import FieldFilter
 from google.oauth2 import service_account
+from st_aggrid import AgGrid
 
 key_dict = json.loads(st.secrets["textkey"])
 creds = service_account.Credentials.from_service_account_info(key_dict)
@@ -58,8 +60,8 @@ def display_results(scoring_group):
 
 # SCORING GROUP 1
 for group in map_tour_groups:
-    score_list = list(db.collection('players').where(
-        'tour_division', '==', group).stream())
+    score_list = list(db.collection('players').where(filter=FieldFilter(
+        'tour_division', '==', group)).stream())
     if len(score_list) > 0:
         df6 = display_results(score_list)
         st.subheader(group)

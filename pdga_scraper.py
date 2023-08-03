@@ -48,6 +48,7 @@ map_tour_divisions = {
 
 def get_total_points(db, player):
     tournament_keys = db.collection('tournaments').get()
+    print(tournament_keys)
     tournaments = tournament_keys.to_dict()
     print(tournaments)
     total = 0
@@ -60,10 +61,11 @@ def get_total_points(db, player):
 
 def create_player(db, tournament, player):
     key = str(player["PDGA#"]).strip(".0") + "_" + \
-        player['Name'].strip(" ") + "_"+str(player["Group"])
+        player['Name'].replace(" ", "") + "_"+str(player["Group"])
     doc_ref = db.collection('players').document(key)
 
     doc = doc_ref.get()
+    print(doc.exists)
     if doc.exists:
         player_info = doc.to_dict()
         total_points = get_total_points(db, player_info)
