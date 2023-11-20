@@ -7,3 +7,4 @@ requests
 pandas
 lxml
 streamlit-sortables
+streamlit_sortables
