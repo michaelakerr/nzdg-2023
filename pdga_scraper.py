@@ -1,6 +1,7 @@
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
+from google.cloud.firestore_v1 import FieldFilter
 
 # Player contains these fields
 # df = df[['PDGA#', 'Name', 'Div', 'Par', "Group", 'Rank', 'Points']]
@@ -45,13 +46,52 @@ map_tour_divisions = {
     "FJ06": "Juniors - Women",
 }
 
+def get_all_tournaments(db):
+    tournaments = db.collection("tournaments").order_by("order").stream()
+    return tournaments
 
 def get_total_points(db, player):
-    tournaments = db.collection('tournaments').stream()
+    majors = db.collection_group("tournaments").where(
+    filter=FieldFilter("major", "==", True)
+    ).stream()
+
+    minors = db.collection_group("tournaments").where(
+    filter=FieldFilter("major", "==", False)
+    ).stream()
     total = 0
-    for t in tournaments:
-        if str(t.id) in player:
-            total = total + player[t.id]
+    major_points_list = []
+    minor_points_list = []
+
+    for m in majors:
+        if str(m.id) in player:
+            major_points_list.append(player[m.id])
+
+    # sort and take top 2 of major scores
+    major_points_list = sorted(major_points_list, key = lambda x:float(x), reverse=True)
+
+    if len(major_points_list) > 2:
+        major_points_list = major_points_list[:2]
+    elif len(major_points_list) > 1:
+        major_points_list = major_points_list[:1]
+
+    # remove null and 0 values from majors
+    major_points_list = [x for x in major_points_list if x != 0]
+    major_points_list = [x for x in major_points_list if x != None]
+
+    for m in minors:
+        if str(m.id) in player:
+            minor_points_list.append(player[m.id])
+
+    # combine major and minor lists
+    total_points = major_points_list + minor_points_list
+    # get top 6 points
+    total_points = sorted(total_points, key = lambda x:float(x), reverse = True)
+    if (len(total_points) > 6):
+        total_points = total_points[:6]
+
+    # add total points together
+    total = sum(total_points)
+
     return total
 
 
@@ -62,10 +102,11 @@ def create_player(db, tournament, player):
     doc = doc_ref.get()
     if doc.exists:
         player_info = doc.to_dict()
+        player_info[str(tournament)] = player["Points"]
         total_points = get_total_points(db, player_info)
         doc_ref.set({
-            "total": total_points,
-            str(tournament): player["Points"]
+            str(tournament): player["Points"],
+            "total": total_points
         }, merge=True)
         print(f'Player data: {doc.to_dict()}')
     else:
@@ -79,7 +120,7 @@ def create_player(db, tournament, player):
             "tour_division": map_tour_divisions[player['Div']],
             "scoring_group": player["Group"],
             "total": player["Points"],
-            str(tournament): player["Points"]
+            str(tournament).replace(" ", "_"): player["Points"]
         }, merge=True)
 
 
@@ -125,6 +166,7 @@ def create_players_and_points(tournament_name, url, tour_points):
     # consolidate all the divs
     df = pd.concat(players)
     df = df[df.Total != "DNF"]
+
     df = df.drop(['Place', 'Points', 'Rating', 'Rd1', 'Rd2', 'Rd3',
                  'Rd4', 'Total', 'Prize (USD)'], axis=1, errors='ignore')
     df = df.loc[:, ~df.columns.str.contains('^Unnamed')]
@@ -133,11 +175,13 @@ def create_players_and_points(tournament_name, url, tour_points):
     # Drop if DNF in par
     df = df.dropna(subset=['Par'])
     df['Rank'] = df.groupby(['Group'])['Par'].rank(
-        method='first', ascending=True)
+        method='min', ascending=True)
 
     # calculate points
     count_players_in_divs = df.groupby(['Group'])['Par'].count()
 
+    # points
+    #tour_points == 1+ (maxtourpoints-1) x (scoring group player count - ranking) / (scoring group player count-1)
     df['Points'] = df.apply(lambda x: 1+(tour_points-1)*(count_players_in_divs[x['Group']
                                                                                ]-x['Rank'])/(count_players_in_divs[x['Group']]-1), axis=1)
 
