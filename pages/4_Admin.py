@@ -8,7 +8,7 @@ from streamlit_sortables import sort_items
 from google.cloud import firestore
 from google.oauth2 import service_account
 from yaml.loader import SafeLoader
-from admin_tasks import add_tournament_and_players, rearrange_tournament_order, remove_tournament_and_player_points
+from admin_tasks import add_tournament_and_players, add_tournament_and_players_non_pdga, rearrange_tournament_order, remove_tournament_and_player_points
 from pdga_scraper import get_all_tournaments
 
 with open('credentials.yaml') as file:
@@ -25,8 +25,7 @@ authenticator = stauth.Authenticate(
     config['cookie']['expiry_days'],
 )
 
-name, authentication_status, username = authenticator.login(
-    'Login', 'main')
+name, authentication_status, username = authenticator.login('main')
 
 if authentication_status:
     authenticator.logout('Logout', 'main')
@@ -49,6 +48,8 @@ if authentication_status:
         points = st.number_input("Points")
         major = st.checkbox("Is this a major tournament?")
         tournament_order = st.number_input("Tournament order", value=max_value)
+
+       # process_non_pdga = st.button("Process non PDGA tournament")
 
         submit = st.button("Submit tournament")
 
@@ -92,6 +93,9 @@ if authentication_status:
         if rearrange_tournaments and sorted_items: 
             rearrange_tournament_order(db, sorted_items)
 
+        #if process_non_pdga:
+            #add_tournament_and_players_non_pdga(db)
+        
 elif authentication_status == False:
     st.error('Username/password is incorrect')
 elif authentication_status == None:

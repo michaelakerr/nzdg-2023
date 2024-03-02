@@ -2,6 +2,7 @@ import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 from google.cloud.firestore_v1 import FieldFilter
+from streamlit_sortables import sort_items
 
 # Player contains these fields
 # df = df[['PDGA#', 'Name', 'Div', 'Par', "Group", 'Rank', 'Points']]
@@ -170,10 +171,12 @@ def create_players_and_points(tournament_name, url, tour_points):
     df = df.drop(['Place', 'Points', 'Rating', 'Rd1', 'Rd2', 'Rd3',
                  'Rd4', 'Total', 'Prize (USD)'], axis=1, errors='ignore')
     df = df.loc[:, ~df.columns.str.contains('^Unnamed')]
+
     df['Par'] = pd.to_numeric(
         df['Par'], errors='coerce').fillna(0, downcast="infer")
     # Drop if DNF in par
     df = df.dropna(subset=['Par'])
+
     df['Rank'] = df.groupby(['Group'])['Par'].rank(
         method='min', ascending=True)
 

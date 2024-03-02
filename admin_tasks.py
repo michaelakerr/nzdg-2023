@@ -1,6 +1,7 @@
 from google.cloud.firestore_v1.base_query import FieldFilter
 from google.cloud import firestore
 import streamlit as st
+from non_pdga_tournaments import create_players_and_points_non_pdga_faultline
 from pdga_scraper import create_player, create_players_and_points, get_total_points
 
 def remove_tournament_and_player_points(db, remove_tournament):
@@ -36,6 +37,24 @@ def add_tournament_and_players(db, name, url, points, major, order):
     })
     # generate player info
     df = create_players_and_points(name, url, points)
+
+    for index, player in df.iterrows():
+        create_player(db, name, player)
+    st.dataframe(df)
+
+def add_tournament_and_players_non_pdga(db):
+    name = "Faultline_Fury"
+    doc_ref = db.collection("tournaments").document(name)
+    doc_ref.set({
+        "name": name,
+        "url": "",
+        "points": 40,
+        "major": False,
+        "order": 13
+    })
+
+    df = create_players_and_points_non_pdga_faultline()
+    # generate player info
 
     for index, player in df.iterrows():
         create_player(db, name, player)
