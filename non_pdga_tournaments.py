@@ -1,10 +1,6 @@
 #Read in Players into a dataframe from csv
-import json
+
 import pandas as pd
-import streamlit
-
-from pdga_scraper import create_player
-
 
 # get players
 # create players and points
@@ -38,7 +34,6 @@ def create_players_and_points_non_pdga_faultline():
         else:
             results.loc[index, 'Group'] = 6
 
-    print(results)
 
 
     results['Rank'] = results.groupby(['Group'])['Par'].rank(
@@ -58,8 +53,6 @@ def create_players_and_points_non_pdga_faultline():
     return results
 
 
-# calculate points
-create_players_and_points_non_pdga_faultline()
 
 #get players
 
