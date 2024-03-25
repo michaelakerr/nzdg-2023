@@ -1,7 +1,9 @@
 secrets.toml
 secrets-test.toml
+secrets-test-2.toml
 nzdg-tour-2023-firebase-adminsdk-1iprr-78dd456e51.json
 nzdg-test-env-firebase-adminsdk-llxlt-1b785bd5a9.json
+nzdg-tour-2023-063b3ba861de.json
 toml_secrets_converter.py
 __pycache__
 *.csv

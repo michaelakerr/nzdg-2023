@@ -8,7 +8,7 @@ from google.oauth2 import service_account
 
 from pdga_scraper import get_all_tournaments
 
-key_dict = json.loads(st.secrets["textkey"])
+key_dict = json.loads(st.secrets["textkey2"])
 creds = service_account.Credentials.from_service_account_info(key_dict)
 db = firestore.Client(credentials=creds)
 

@@ -8,13 +8,13 @@ from streamlit_sortables import sort_items
 from google.cloud import firestore
 from google.oauth2 import service_account
 from yaml.loader import SafeLoader
-from admin_tasks import add_tournament_and_players, add_tournament_and_players_non_pdga, rearrange_tournament_order, remove_tournament_and_player_points
+from admin_tasks import add_tournament_and_players, rearrange_tournament_order, remove_tournament_and_player_points
 from pdga_scraper import get_all_tournaments
 
 with open('credentials.yaml') as file:
     config = yaml.load(file, Loader=SafeLoader)
 
-key_dict = json.loads(st.secrets["textkey"])
+key_dict = json.loads(st.secrets["textkey2"])
 creds = service_account.Credentials.from_service_account_info(key_dict)
 db = firestore.Client(credentials=creds)
 

@@ -1,11 +1,11 @@
 import toml
 
-output_file = ".streamlit/secrets-test.toml"
+output_file = ".streamlit/secrets-test-2.toml"
 
-with open("nzdg-test-env-firebase-adminsdk-llxlt-1b785bd5a9.json") as json_file:
+with open("nzdg-tour-2023-063b3ba861de.json") as json_file:
     json_text = json_file.read()
 
-config = {"textkey": json_text}
+config = {"textkey2": json_text}
 toml_config = toml.dumps(config)
 
 with open(output_file, "w") as target:

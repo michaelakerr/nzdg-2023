@@ -4,9 +4,6 @@ import streamlit as st
 
 import json
 
-import streamlit as st
-import streamlit_authenticator as stauth
-import yaml
 from google.cloud import firestore
 from google.oauth2 import service_account
 
