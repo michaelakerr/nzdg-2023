@@ -70,9 +70,9 @@ def get_total_points(db, player):
     # sort and take top 2 of major scores
     major_points_list = sorted(major_points_list, key = lambda x:float(x), reverse=True)
 
-    if len(major_points_list) > 2:
+    if len(major_points_list) >= 2:
         major_points_list = major_points_list[:2]
-    elif len(major_points_list) > 1:
+    elif len(major_points_list) >= 1:
         major_points_list = major_points_list[:1]
 
     # remove null and 0 values from majors
