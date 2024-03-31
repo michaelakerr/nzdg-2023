@@ -74,14 +74,18 @@ def display_results(scoring_group):
     return df
 
 
+def display_group_results(group):
+    score_list = list(db.collection('players').where(filter=FieldFilter(
+            'tour_division', '==', group)).stream())
+    if len(score_list) > 0:
+            df6 = display_results(score_list)
+            st.subheader(group)
+            st.caption(', '.join(map_tour_groups[group]))
+            # remove underscores from headers in dataframe 
+            df6.columns = df6.columns.str.replace('_', ' ')
+            st.dataframe(df6, hide_index=True, column_config=config)
+
 # SCORING GROUP 1
 for group in map_tour_groups:
-    score_list = list(db.collection('players').where(filter=FieldFilter(
-        'tour_division', '==', group)).stream())
-    if len(score_list) > 0:
-        df6 = display_results(score_list)
-        st.subheader(group)
-        st.caption(', '.join(map_tour_groups[group]))
-        # remove underscores from headers in dataframe 
-        df6.columns = df6.columns.str.replace('_', ' ')
-        st.dataframe(df6, hide_index=True, column_config=config)
+    if st.button(group, key=group):
+        display_group_results(group)
