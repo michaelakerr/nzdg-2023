@@ -8,11 +8,12 @@ import streamlit as st
 from google.cloud import firestore
 from google.oauth2 import service_account
 
-key_dict = json.loads(st.secrets["textkey"])
-creds = service_account.Credentials.from_service_account_info(key_dict)
-db = firestore.Client(credentials=creds)
+# key_dict = json.loads(st.secrets["textkey"])
+# creds = service_account.Credentials.from_service_account_info(key_dict)
+# db = firestore.Client(credentials=creds)
 
 # Player contains these fields
+
 map_tour_divisions = {
     "MPO": "Open - Mixed",
     "MP40": "Pro Masters - Mixed",
@@ -54,11 +55,12 @@ map_tour_divisions = {
     "FJ06": "Juniors - Women",
 }
 
-def get_all_tournaments():
+
+def get_all_tournaments(db):
     tournaments = db.collection("tournaments").order_by("order").stream()
     return tournaments
 
-def get_total_points(player):
+def get_total_points(db, player):
     majors = db.collection_group("tournaments").where(
     filter=FieldFilter("major", "==", True)
     ).stream()
