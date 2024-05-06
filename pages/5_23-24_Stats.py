@@ -22,6 +22,7 @@ def get_all_players():
         unique_players[player.id] = player.to_dict()
     return unique_players
 
+@st.cache_data(persist="disk")
 def get_all_tournaments():
     tournaments = db.collection(u'tournaments').stream()
     unique_tournaments = {}

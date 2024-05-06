@@ -54,12 +54,10 @@ map_tour_divisions = {
     "FJ06": "Juniors - Women",
 }
 
-@st.cache_resource
 def get_all_tournaments():
     tournaments = db.collection("tournaments").order_by("order").stream()
     return tournaments
 
-@st.cache_resource
 def get_total_points(player):
     majors = db.collection_group("tournaments").where(
     filter=FieldFilter("major", "==", True)
