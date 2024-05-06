@@ -1,11 +1,18 @@
+import json
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 from google.cloud.firestore_v1 import FieldFilter
 from streamlit_sortables import sort_items
+import streamlit as st
+from google.cloud import firestore
+from google.oauth2 import service_account
+
+key_dict = json.loads(st.secrets["textkey"])
+creds = service_account.Credentials.from_service_account_info(key_dict)
+db = firestore.Client(credentials=creds)
 
 # Player contains these fields
-# df = df[['PDGA#', 'Name', 'Div', 'Par', "Group", 'Rank', 'Points']]
 map_tour_divisions = {
     "MPO": "Open - Mixed",
     "MP40": "Pro Masters - Mixed",
@@ -39,7 +46,7 @@ map_tour_divisions = {
     "FP60": "Senior Grand Masters - Women",
     "FP70": "Legends - Women",
     "FA70": "Legends - Women",
-    "FJ18": "Juniors- Women",
+    "FJ18": "Juniors - Women",
     "FJ15": "Juniors - Women",
     "FJ12": "Juniors - Women",
     "FJ10": "Juniors - Women",
@@ -47,11 +54,13 @@ map_tour_divisions = {
     "FJ06": "Juniors - Women",
 }
 
-def get_all_tournaments(db):
+@st.cache_resource
+def get_all_tournaments():
     tournaments = db.collection("tournaments").order_by("order").stream()
     return tournaments
 
-def get_total_points(db, player):
+@st.cache_resource
+def get_total_points(player):
     majors = db.collection_group("tournaments").where(
     filter=FieldFilter("major", "==", True)
     ).stream()

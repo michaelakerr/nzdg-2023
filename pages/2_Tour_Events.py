@@ -7,13 +7,14 @@ import json
 from google.cloud import firestore
 from google.oauth2 import service_account
 
+from parser_for_pdga import export_players_to_csv
+
 key_dict = json.loads(st.secrets["textkey"])
 creds = service_account.Credentials.from_service_account_info(key_dict)
 db = firestore.Client(credentials=creds)
 
-st.set_page_config(initial_sidebar_state="collapsed")
-
 def showTournaments():
+
     posts_ref = db.collection("tournaments").order_by("order")
     
     for doc in posts_ref.stream():
@@ -28,6 +29,8 @@ def showTournaments():
         st.write(f"Points: {points}")
         if major:
             st.write(f"Major")
+
+    #export_players_to_csv()
 
 
 showTournaments()
