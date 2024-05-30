@@ -8,6 +8,8 @@ import streamlit as st
 from google.cloud import firestore
 from google.oauth2 import service_account
 
+from CONSTANTS import PLAYER_TABLE_DB, TOURNAMENT_TABLE_DB
+
 # key_dict = json.loads(st.secrets["textkey"])
 # creds = service_account.Credentials.from_service_account_info(key_dict)
 # db = firestore.Client(credentials=creds)
@@ -57,15 +59,15 @@ map_tour_divisions = {
 
 
 def get_all_tournaments(db):
-    tournaments = db.collection("tournaments").order_by("order").stream()
+    tournaments = db.collection(TOURNAMENT_TABLE_DB).order_by("order").stream()
     return tournaments
 
 def get_total_points(db, player):
-    majors = db.collection_group("tournaments").where(
+    majors = db.collection_group(TOURNAMENT_TABLE_DB).where(
     filter=FieldFilter("major", "==", True)
     ).stream()
 
-    minors = db.collection_group("tournaments").where(
+    minors = db.collection_group(TOURNAMENT_TABLE_DB).where(
     filter=FieldFilter("major", "==", False)
     ).stream()
     total = 0
@@ -108,7 +110,7 @@ def get_total_points(db, player):
 def create_player(db, tournament, player):
     key = str(player["PDGA#"]).strip(".0") + "_" + \
         player['Name'].replace(" ", "") + "_"+str(player["Group"])
-    doc_ref = db.collection('players').document(key)
+    doc_ref = db.collection(PLAYER_TABLE_DB).document(key)
     doc = doc_ref.get()
     if doc.exists:
         player_info = doc.to_dict()
@@ -121,7 +123,7 @@ def create_player(db, tournament, player):
         print(f'Player data: {doc.to_dict()}')
     else:
         print('No such Player!')
-        doc_ref = db.collection("players").document(key)
+        doc_ref = db.collection(PLAYER_TABLE_DB).document(key)
         doc_ref.set({
             "name": player['Name'],
             "pdga_number": player['PDGA#'],

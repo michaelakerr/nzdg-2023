@@ -48,9 +48,7 @@ def showAboutTheTour():
         ## Points system feedback
         Players can give feedback on the points system by emailing Michaela Kerr: mikki.mjk@gmail.com
         If you have points queries, please email me as well. 
-
         """
-
     )
     
 showAboutTheTour()

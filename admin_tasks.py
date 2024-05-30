@@ -1,13 +1,14 @@
 from google.cloud.firestore_v1.base_query import FieldFilter
 from google.cloud import firestore
 import streamlit as st
+from CONSTANTS import PLAYER_TABLE_DB, TOURNAMENT_TABLE_DB
 from non_pdga_tournaments import create_players_and_points_non_pdga_faultline
 from pdga_scraper import create_player, create_players_and_points, get_total_points
 
 def remove_tournament_and_player_points(db, remove_tournament):
-    db.collection("tournaments").document(remove_tournament).delete()
+    db.collection(TOURNAMENT_TABLE_DB).document(remove_tournament).delete()
             # remove from all players too 
-    players = db.collection("players").where(
+    players = db.collection(PLAYER_TABLE_DB).where(
         filter=FieldFilter(str(remove_tournament), ">", 0)).stream()
     
     for player in players:
@@ -27,7 +28,7 @@ def remove_tournament_and_player_points(db, remove_tournament):
 
 def add_tournament_and_players(db, name, url, points, major, order):
     name = name.replace(" ", "_")
-    doc_ref = db.collection("tournaments").document(name)
+    doc_ref = db.collection(TOURNAMENT_TABLE_DB).document(name)
     doc_ref.set({
         "name": name,
         "url": url,
@@ -44,7 +45,7 @@ def add_tournament_and_players(db, name, url, points, major, order):
 
 def add_tournament_and_players_non_pdga(db):
     name = "Faultline_Fury"
-    doc_ref = db.collection("tournaments").document(name)
+    doc_ref = db.collection(TOURNAMENT_TABLE_DB).document(name)
     doc_ref.set({
         "name": name,
         "url": "",
@@ -63,6 +64,6 @@ def add_tournament_and_players_non_pdga(db):
 
 def rearrange_tournament_order(db, sorted_items):
     for index, item in enumerate(sorted_items):
-        db.collection("tournaments").document(item).update({"order": index})
+        db.collection(TOURNAMENT_TABLE_DB).document(item).update({"order": index})
 
     st.write(f"Rearranged tournaments: {sorted_items}")
