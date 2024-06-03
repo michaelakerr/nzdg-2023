@@ -221,5 +221,3 @@ def create_players_and_points(tournament_name, url, tour_points):
 
     df.to_csv(tournament_name + '.csv', index=False)
     return df
-
-create_players_and_points('Knottingley_Giants', 'https://www.pdga.com/tour/event/80508', 40 )
