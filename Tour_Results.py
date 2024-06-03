@@ -5,6 +5,7 @@ import streamlit as st
 from google.cloud import firestore
 from google.cloud.firestore_v1.base_query import FieldFilter
 from google.oauth2 import service_account
+from CONSTANTS import PLAYER_TABLE_DB
 
 from pdga_scraper import get_all_tournaments
 
@@ -48,7 +49,7 @@ def display_results(scoring_group):
     users_dict = list(map(lambda x: x.to_dict(), scoring_group))
     df = pd.DataFrame(users_dict)
     df = df.drop(['key', 'scoring_group',
-                 'group', 'tour_division'], axis=1)
+                 'Player_Group', 'tour_division'], axis=1)
     
     tournaments_list = get_all_tournaments(db)
 
@@ -78,7 +79,7 @@ def display_results(scoring_group):
 
 
 def display_group_results(group):
-    score_list = list(db.collection('players').where(filter=FieldFilter(
+    score_list = list(db.collection(PLAYER_TABLE_DB).where(filter=FieldFilter(
             'tour_division', '==', group)).stream())
     if len(score_list) > 0:
             df6 = display_results(score_list)

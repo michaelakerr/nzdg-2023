@@ -18,36 +18,36 @@ def create_players_and_points_non_pdga_faultline():
               'FA3', 'MA4', 'FA2', 'FA4', 'MJ18', 'MJ12', 'MA70']
     
     # ADd a column to dataframe based on division called group
-    results['Group'] = ''
+    results['Player_Group'] = ''
 
     for index, row in results.iterrows():
         if row['Div'] in group1:
-            results.loc[index, 'Group'] = 1
+            results.loc[index, 'Player_Group'] = 1
         elif row['Div'] in group2:
-            results.loc[index, 'Group'] = 2
+            results.loc[index, 'Player_Group'] = 2
         elif row['Div'] in group3:
-            results.loc[index, 'Group'] = 3
+            results.loc[index, 'Player_Group'] = 3
         elif row['Div'] in group4:
-            results.loc[index, 'Group'] = 4
+            results.loc[index, 'Player_Group'] = 4
         elif row['Div'] in group5:
-            results.loc[index, 'Group'] = 5
+            results.loc[index, 'Player_Group'] = 5
         else:
-            results.loc[index, 'Group'] = 6
+            results.loc[index, 'Player_Group'] = 6
 
 
 
-    results['Rank'] = results.groupby(['Group'])['Par'].rank(
+    results['Rank'] = results.groupby(['Player_Group'])['Par'].rank(
         method='max', ascending=True)
     
-    count_players_in_divs = results.groupby(['Group'])['Par'].count()
+    count_players_in_divs = results.groupby(['Player_Group'])['Par'].count()
 
     # points
     #tour_points == 1+ (maxtourpoints-1) x (scoring group player count - ranking) / (scoring group player count-1)
-    results['Points'] = results.apply(lambda x: 1+(tour_points-1)*(count_players_in_divs[x['Group']
-                                                                               ]-x['Rank'])/(count_players_in_divs[x['Group']]-1), axis=1)
+    results['Points'] = results.apply(lambda x: 1+(tour_points-1)*(count_players_in_divs[x['Player_Group']
+                                                                               ]-x['Rank'])/(count_players_in_divs[x['Player_Group']]-1), axis=1)
 
     # rearrange columns
-    results = results[['PDGA#', 'Name', 'Div', 'Par', 'Group', 'Rank', 'Points']]
+    results = results[['PDGA#', 'Name', 'Div', 'Par', 'Player_Group', 'Rank', 'Points']]
 
     results.to_csv(tournament_name + '.csv', index=False)
     return results

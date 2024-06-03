@@ -1,4 +1,5 @@
 import json
+from io import StringIO
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
@@ -74,25 +75,27 @@ def get_total_points(db, player):
     major_points_list = []
     minor_points_list = []
 
-    for m in majors:
-        if str(m.id) in player:
-            major_points_list.append(player[m.id])
+    if majors.count() > 0:
+        for m in majors:
+            if str(m.id) in player:
+                major_points_list.append(player[m.id])
 
-    # sort and take top 2 of major scores
-    major_points_list = sorted(major_points_list, key = lambda x:float(x), reverse=True)
+        # sort and take top 2 of major scores
+        major_points_list = sorted(major_points_list, key = lambda x:float(x), reverse=True)
 
-    if len(major_points_list) >= 2:
-        major_points_list = major_points_list[:2]
-    elif len(major_points_list) >= 1:
-        major_points_list = major_points_list[:1]
+        if len(major_points_list) >= 2:
+            major_points_list = major_points_list[:2]
+        elif len(major_points_list) >= 1:
+            major_points_list = major_points_list[:1]
 
-    # remove null and 0 values from majors
-    major_points_list = [x for x in major_points_list if x != 0]
-    major_points_list = [x for x in major_points_list if x != None]
+        # remove null and 0 values from majors
+        major_points_list = [x for x in major_points_list if x != 0]
+        major_points_list = [x for x in major_points_list if x != None]
 
-    for m in minors:
-        if str(m.id) in player:
-            minor_points_list.append(player[m.id])
+    if minors.count() > 0:
+        for m in minors:
+            if str(m.id) in player:
+                minor_points_list.append(player[m.id])
 
     # combine major and minor lists
     total_points = major_points_list + minor_points_list
@@ -135,13 +138,22 @@ def create_player(db, tournament, player):
             str(tournament).replace(" ", "_"): player["Points"]
         }, merge=True)
 
+# Define a custom ranking function
+def custom_rank(group):
+    # First rank by 'par', then by 'place'
+    group = group.sort_values(by=['Par', 'Place']).reset_index(drop=True)
+
+    # Add a 'rank' column
+    group['Rank'] = group.index + 1
+
+    return group
 
 def create_players_and_points(tournament_name, url, tour_points):
     response = requests.get(url)
 
     group1 = ['MPO']
     group2 = ['MP40', 'MP50']
-    group3 = ['MA1', 'FPO'],
+    group3 = ['MA1', 'FPO']
     group4 = ['MA2']
     group5 = ['MA40', 'MA50']
     group6 = ['MA3', 'MA60',  'MA4', 'MJ18', 'MJ12', 'MA70']
@@ -159,55 +171,55 @@ def create_players_and_points(tournament_name, url, tour_points):
 
     # Get players
     page = soup.find_all('details')
-    players = pd.read_html(str(page))
+    players = pd.read_html(StringIO(str(page)))
 
     for index, div in enumerate(players):
         div['Div'] = list_of_divs[index]
         if list_of_divs[index] in group1:
-            div['Group'] = 1
+            div['Player_Group'] = 1
         elif list_of_divs[index] in group2:
-            div['Group'] = 2
+            div['Player_Group'] = 2
         elif list_of_divs[index] in group3:
-            div['Group'] = 3
+            div['Player_Group'] = 3
         elif list_of_divs[index] in group4:
-            div['Group'] = 4
+            div['Player_Group'] = 4
         elif list_of_divs[index] in group5:
-            div['Group'] = 5
+            div['Player_Group'] = 5
         elif list_of_divs[index] in group6:
-            div['Group'] = 6
+            div['Player_Group'] = 6
         elif list_of_divs[index] in group7:
-            div['Group'] = 7
+            div['Player_Group'] = 7
         elif list_of_divs[index] in group8:
-            div['Group'] = 8
+            div['Player_Group'] = 8
         else:
-            div['Group'] = 0
+            div['Player_Group'] = 0
 
     # consolidate all the divs
     df = pd.concat(players)
     df = df[df.Total != "DNF"]
 
-    df = df.drop(['Place', 'Points', 'Rating', 'Rd1', 'Rd2', 'Rd3',
+    df = df.drop(['Points', 'Rating', 'Rd1', 'Rd2', 'Rd3',
                  'Rd4', 'Total', 'Prize (USD)'], axis=1, errors='ignore')
     df = df.loc[:, ~df.columns.str.contains('^Unnamed')]
 
     df['Par'] = pd.to_numeric(
-        df['Par'], errors='coerce').fillna(0, downcast="infer")
+        df['Par'], errors='coerce', downcast='integer').fillna(0)
     # Drop if DNF in par
     df = df.dropna(subset=['Par'])
-
-    df['Rank'] = df.groupby(['Group'])['Par'].rank(
-        method='min', ascending=True)
+    df = df.groupby('Player_Group', group_keys=False).apply(custom_rank)
 
     # calculate points
-    count_players_in_divs = df.groupby(['Group'])['Par'].count()
+    count_players_in_divs = df.groupby(['Player_Group'])['Par'].count()
 
     # points
     #tour_points == 1+ (maxtourpoints-1) x (scoring group player count - ranking) / (scoring group player count-1)
-    df['Points'] = df.apply(lambda x: 1+(tour_points-1)*(count_players_in_divs[x['Group']
-                                                                               ]-x['Rank'])/(count_players_in_divs[x['Group']]-1), axis=1)
+    df['Points'] = df.apply(lambda x: 1+(tour_points-1)*(count_players_in_divs[x['Player_Group']
+                                                                               ]-x['Rank'])/(count_players_in_divs[x['Player_Group']]-1), axis=1)
 
     # rearrange columns
-    df = df[['PDGA#', 'Name', 'Div', 'Par', 'Group', 'Rank', 'Points']]
+    df = df[['PDGA#', 'Name', 'Div', 'Par', 'Player_Group', 'Rank', 'Points']]
 
     df.to_csv(tournament_name + '.csv', index=False)
     return df
+
+create_players_and_points('Knottingley_Giants', 'https://www.pdga.com/tour/event/80508', 40 )

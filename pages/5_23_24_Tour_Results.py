@@ -51,7 +51,7 @@ def display_results(scoring_group):
     users_dict = list(map(lambda x: x.to_dict(), scoring_group))
     df = pd.DataFrame(users_dict)
     df = df.drop(['key', 'scoring_group',
-                 'group', 'tour_division'], axis=1)
+                 'Player_Group', 'tour_division'], axis=1)
     
     tournaments_list = get_all_tournaments(db)
 
