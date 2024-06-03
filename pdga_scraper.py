@@ -141,11 +141,12 @@ def create_players_and_points(tournament_name, url, tour_points):
 
     group1 = ['MPO']
     group2 = ['MP40', 'MP50']
-    group3 = ['FPO', 'MA1']
-    group4 = ['MA40', 'MA50']
-    group5 = ['MA2']
-    group6 = ['MA3', 'MA60', 'FA1', 'FA40', 'FA50', 'FA60',
-              'FA3', 'MA4', 'FA2', 'FA4', 'MJ18', 'MJ12', 'MA70']
+    group3 = ['MA1', 'FPO'],
+    group4 = ['MA2']
+    group5 = ['MA40', 'MA50']
+    group6 = ['MA3', 'MA60',  'MA4', 'MJ18', 'MJ12', 'MA70']
+    group7 = ['FA1',  'FA40']
+    group8 = ['FA50', 'FA60', 'FA2', 'FA3', 'FA4', 'FJ18' , 'FJ12']
 
     soup = BeautifulSoup(response.text, 'html.parser')
 
@@ -172,8 +173,14 @@ def create_players_and_points(tournament_name, url, tour_points):
             div['Group'] = 4
         elif list_of_divs[index] in group5:
             div['Group'] = 5
-        else:
+        elif list_of_divs[index] in group6:
             div['Group'] = 6
+        elif list_of_divs[index] in group7:
+            div['Group'] = 7
+        elif list_of_divs[index] in group8:
+            div['Group'] = 8
+        else:
+            div['Group'] = 0
 
     # consolidate all the divs
     df = pd.concat(players)

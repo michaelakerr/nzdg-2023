@@ -12,12 +12,15 @@ def showAboutTheTour():
         while also encouraging cross group competition for tournament directors (TD's).
 
         The scoring groups are:
+
         - Group 1: MPO
         - Group 2: MP40, MP50
         - Group 3: FPO, MA1
         - Group 4: MA40, MA50
         - Group 5: MA2
-        - Group 6: ALL OTHER DIVISIONS - MA3, MA60, FA1, FA40, FA50, FA60, FA3, MA4, FA2, FA4, Junior Divisions etc
+        - Group 6: ALL OTHER MA Divisions - MA3, MA60, MA4, MJ18, MJ12, MA70
+        - Group 7: FA1, FA40
+        - Group 8: ALL OTHER FA Divisions - FA50, FA60, FA2, FA3, FA4, FJ18, FJ12 
 
         Please find more information on scoring groups here: https://www.newzealanddiscgolf.org.nz/_files/ugd/acb9ce_d0f8c560ef694f55a30a420b4a9b6dd5.pdf
 
@@ -40,6 +43,13 @@ def showAboutTheTour():
         - Tour Rankings are calculated by the sum of the best 6 tour events for each player, including at most 2 major events. The full policy is available here: https://www.newzealanddiscgolf.org.nz/_files/ugd/acb9ce_836d0cb72ab845be9073b1987bc5f49c.pdf
         - Major events are worth 70 points, and are indicated on the tour calendar as North Islands, South Islands, and National Championships.
 
+        ## Tour Points per event
+        - Tour Points for an event are now determined by PDGA tier, if a tournament is not sanctioned, it is not worth any points. 
+        Points are as follows:
+        - Major: 70 points
+        - A tier: 60 points
+        - B tier: 50 points
+        - C tier: 40 points
 
         ## Tour feedback
         Players can give feedback on the tour by visiting this link:
