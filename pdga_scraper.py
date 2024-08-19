@@ -112,7 +112,7 @@ def get_total_points(db, player):
 
 def create_player(db, tournament, player):
     key = str(player["PDGA#"]).strip(".0") + "_" + \
-        player['Name'].replace(" ", "") + "_"+str(player["Group"])
+        player['Name'].replace(" ", "") + "_"+str(player['Player_Group'])
     doc_ref = db.collection(PLAYER_TABLE_DB).document(key)
     doc = doc_ref.get()
     if doc.exists:
@@ -131,9 +131,9 @@ def create_player(db, tournament, player):
             "name": player['Name'],
             "pdga_number": player['PDGA#'],
             "key": key,
-            "group": player["Group"],
+            'Player_Group': player['Player_Group'],
             "tour_division": map_tour_divisions[player['Div']],
-            "scoring_group": player["Group"],
+            "scoring_group": player['Player_Group'],
             "total": player["Points"],
             str(tournament).replace(" ", "_"): player["Points"]
         }, merge=True)
