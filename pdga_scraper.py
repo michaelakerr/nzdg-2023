@@ -65,63 +65,46 @@ def get_all_tournaments(db):
 
 
 def get_total_points(db, player):
-    majors = (
+    # Fetching major and minor tournaments
+    majors = list(
         db.collection_group(TOURNAMENT_TABLE_DB)
         .where(filter=FieldFilter("major", "==", True))
         .stream()
     )
 
-    minors = (
-        db.collection_group(TOURNAMENT_TABLE_DB)
+    minors = list(
+        db.collection_group("tournaments")
         .where(filter=FieldFilter("major", "==", False))
         .stream()
     )
+    print(minors)
 
-    majors_list = list(majors)
-    majors_count = len(majors_list)
-    minors_list = list(minors)
-    minors_count = len(minors_list)
-
-    total = 0
     major_points_list = []
     minor_points_list = []
 
-    # get major and minor scores
+    # Process majors
+    for m in majors:
+        if str(m.id) in player:
+            major_points_list.append(player[m.id])
 
-    if majors_count > 0:
-        for m in majors:
-            if str(m.id) in player:
-                major_points_list.append(player[m.id])
+    # Sort and take top 2 major scores, remove 0 or None values
+    major_points_list = sorted(
+        [x for x in major_points_list if x not in [0, None]],
+        key=lambda x: float(x),
+        reverse=True,
+    )[:2]
 
-        # sort and take top 2 of major scores
-        major_points_list = sorted(
-            major_points_list, key=lambda x: float(x), reverse=True
-        )
+    # Process minors
+    for m in minors:
+        if str(m.id) in player:
+            minor_points_list.append(player[m.id])
 
-        if len(major_points_list) >= 2:
-            major_points_list = major_points_list[:2]
-        elif len(major_points_list) >= 1:
-            major_points_list = major_points_list[:1]
+    # Combine and take top 6 points
+    total_points = sorted(
+        major_points_list + minor_points_list, key=lambda x: float(x), reverse=True
+    )[:6]
 
-        # remove null and 0 values from majors
-        major_points_list = [x for x in major_points_list if x != 0]
-        major_points_list = [x for x in major_points_list if x != None]
-
-    if minors_count > 0:
-        for m in minors:
-            if str(m.id) in player:
-                minor_points_list.append(player[m.id])
-
-    # combine major and minor lists
-    total_points = major_points_list + minor_points_list
-    # get top 6 points
-    total_points = sorted(total_points, key=lambda x: float(x), reverse=True)
-    print(total_points)
-    print(minor_points_list)
-    if len(total_points) > 6:
-        total_points = total_points[:6]
-
-    # add total points together
+    # Calculate total
     total = sum(total_points)
 
     return total
