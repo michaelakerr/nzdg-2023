@@ -116,6 +116,8 @@ def get_total_points(db, player):
     total_points = major_points_list + minor_points_list
     # get top 6 points
     total_points = sorted(total_points, key=lambda x: float(x), reverse=True)
+    print(total_points)
+    print(minor_points_list)
     if len(total_points) > 6:
         total_points = total_points[:6]
 
@@ -175,14 +177,34 @@ def custom_rank(group):
 def create_players_and_points(tournament_name, url, tour_points):
     response = requests.get(url)
 
+    # group1 = ["MPO"]
+    # group2 = ["MP40", "MP50"]
+    # group3 = ["MA1", "FPO"]
+    # group4 = ["MA2"]
+    # group5 = ["MA40", "MA50"]
+    # group6 = ["MA3", "MA60", "MA4", "MJ18", "MJ12", "MA70"]
+    # group7 = ["FA1", "FA40"]
+    # group8 = ["FA50", "FA60", "FA2", "FA3", "FA4", "FJ18", "FJ12"]
     group1 = ["MPO"]
     group2 = ["MP40", "MP50"]
-    group3 = ["MA1", "FPO"]
-    group4 = ["MA2"]
-    group5 = ["MA40", "MA50"]
-    group6 = ["MA3", "MA60", "MA4", "MJ18", "MJ12", "MA70"]
-    group7 = ["FA1", "FA40"]
-    group8 = ["FA50", "FA60", "FA2", "FA3", "FA4", "FJ18", "FJ12"]
+    group3 = ["FPO", "MA1"]
+    group4 = ["MA40", "MA50"]
+    group5 = ["MA2"]
+    group6 = [
+        "MA3",
+        "MA60",
+        "FA1",
+        "FA40",
+        "FA50",
+        "FA60",
+        "FA3",
+        "MA4",
+        "FA2",
+        "FA4",
+        "MJ18",
+        "MJ12",
+        "MA70",
+    ]
 
     soup = BeautifulSoup(response.text, "html.parser")
 
@@ -209,14 +231,8 @@ def create_players_and_points(tournament_name, url, tour_points):
             div["Player_Group"] = 4
         elif list_of_divs[index] in group5:
             div["Player_Group"] = 5
-        elif list_of_divs[index] in group6:
-            div["Player_Group"] = 6
-        elif list_of_divs[index] in group7:
-            div["Player_Group"] = 7
-        elif list_of_divs[index] in group8:
-            div["Player_Group"] = 8
         else:
-            div["Player_Group"] = 0
+            div["Player_Group"] = 6
 
     # consolidate all the divs
     df = pd.concat(players)
