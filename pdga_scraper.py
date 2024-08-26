@@ -73,7 +73,7 @@ def get_total_points(db, player):
     )
 
     minors = list(
-        db.collection_group("tournaments")
+        db.collection_group(TOURNAMENT_TABLE_DB)
         .where(filter=FieldFilter("major", "==", False))
         .stream()
     )
@@ -127,7 +127,7 @@ def create_player(db, tournament, player):
         doc_ref.set(
             {str(tournament): player["Points"], "total": total_points}, merge=True
         )
-        print(f"Player data: {doc.to_dict()}")
+
     else:
         print("No such Player!")
         doc_ref = db.collection(PLAYER_TABLE_DB).document(key)
