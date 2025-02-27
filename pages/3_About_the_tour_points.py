@@ -1,5 +1,14 @@
 import streamlit as st
 
+#   - Group 1: MPO
+#   - Group 2: MP40, MP50
+#  - Group 3: FPO, MA1
+#  - Group 4: MA40, MA50
+#   - Group 5: MA2
+#   - Group 6: ALL OTHER MA Divisions - MA3, MA60, MA4, MJ18, MJ12, MA70
+#   - Group 7: FA1, FA40
+#  - Group 8: ALL OTHER FA Divisions - FA50, FA60, FA2, FA3, FA4, FJ18, FJ12
+
 
 def showAboutTheTour():
     st.header("About NZDG Tour Points System")
@@ -18,12 +27,17 @@ def showAboutTheTour():
         - Group 3: FPO, MA1
         - Group 4: MA40, MA50
         - Group 5: MA2
-        - Group 6: ALL OTHER MA Divisions - MA3, MA60, MA4, MJ18, MJ12, MA70
-        - Group 7: FA1, FA40
-        - Group 8: ALL OTHER FA Divisions - FA50, FA60, FA2, FA3, FA4, FJ18, FJ12 
+        - Group 6: ALL OTHER Divisions
 
         Please find more information on scoring groups here: https://www.newzealanddiscgolf.org.nz/_files/ugd/acb9ce_d0f8c560ef694f55a30a420b4a9b6dd5.pdf
 
+        Also please note, for nationals, due to the large number of group 6 competitors, the group 6 divisions are split into two groups,
+        with the following split. 
+
+        - Group 6A: FA1, MA3, MA4, MJ18, MJ12, MA70
+        - Group 6B: ALL OTHER DIVISIONS
+
+        
         ### How the Tour Points System allocates points
         - Tour Points are awarded to players based on their finishing position in their scoring group.
         - All scoring groups are elegibile for the total number of points at the tour event (for example 50 points in Group 1).
@@ -60,5 +74,6 @@ def showAboutTheTour():
         If you have points queries, please email me as well. 
         """
     )
-    
+
+
 showAboutTheTour()

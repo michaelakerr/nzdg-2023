@@ -148,11 +148,14 @@ def create_player(db, tournament, player):
 
 # Define a custom ranking function
 def custom_rank(group):
+    # # Add 66 to 'Par' for the specific player
+    # group.loc[group["PDGA#"] == 227315, "Par"] += 3
+
     # First rank by 'par', then by 'place'
     group = group.sort_values(by=["Par", "Place"]).reset_index(drop=True)
 
-    # Add a 'rank' column
-    group["Rank"] = group.index + 1
+    # Add a 'rank' column - in the case of same par and place then assign same points.
+    group["Rank"] = group.groupby(["Par", "Place"]).ngroup() + 1
 
     return group
 
@@ -188,6 +191,10 @@ def create_players_and_points(tournament_name, url, tour_points):
         "MJ12",
         "MA70",
     ]
+    group6a = ["FA1", "MA3", "MA4", "MJ18", "MJ12", "MA70"]
+    # everything else
+    group6b = ["FA40", "FA50", "FA60", "FA2", "FA3", "FA4", "FJ18", "FJ12"]
+    # Fa1, ma3, ma4, mj18, mj15
 
     soup = BeautifulSoup(response.text, "html.parser")
 
@@ -214,6 +221,8 @@ def create_players_and_points(tournament_name, url, tour_points):
             div["Player_Group"] = 4
         elif list_of_divs[index] in group5:
             div["Player_Group"] = 5
+        # elif list_of_divs[index] in group6:
+        #     div["Player_Group"] = 6
         else:
             div["Player_Group"] = 6
 
