@@ -5,7 +5,7 @@ from CONSTANTS import PLAYER_TABLE_DB, TOURNAMENT_TABLE_DB
 from non_pdga_tournaments import create_players_and_points_non_pdga_faultline
 from pdga_scraper import create_player, create_players_and_points, get_total_points
 import re
-from firebase_admin.firestore import FieldFilter
+from google.cloud.firestore_v1 import FieldFilter
 from firebase_admin import firestore
 
 

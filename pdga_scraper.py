@@ -1,13 +1,8 @@
-import json
 from io import StringIO
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 from google.cloud.firestore_v1 import FieldFilter
-from streamlit_sortables import sort_items
-import streamlit as st
-from google.cloud import firestore
-from google.oauth2 import service_account
 
 from CONSTANTS import PLAYER_TABLE_DB, TOURNAMENT_TABLE_DB
 
