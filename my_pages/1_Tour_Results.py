@@ -53,13 +53,15 @@ def display_results(scoring_group):
     df = pd.DataFrame(users_dict)
     df = df.drop(["key", "scoring_group", "Player_Group", "tour_division"], axis=1)
 
-    tournaments_list = get_all_tournaments(db)
+    tournaments_stream = get_all_tournaments(db)
+    tournaments = []
+    for t in tournaments_stream:
+        if t.exists:
+            tournaments.append(t.to_dict())
 
-    if len(tournaments_list) == 0:
+    if len(tournaments) == 0:
         st.write("No tournaments entered yet")
         return None
-
-    tournaments = list(map(lambda x: x.to_dict(), tournaments_list))
 
     tournament_df = pd.DataFrame(tournaments)
     if len(tournament_df) > 0:

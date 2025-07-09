@@ -13,3 +13,5 @@
 
 # To run against the test db
 1. Change all refrences to of `textkey` to `textkeytest`
+
+WHen adding a new tour year, remember to go to Automatic index settings in firebase and add a new index for collecionGroupAsc for tournamens and field major. 

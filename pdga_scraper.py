@@ -56,6 +56,7 @@ map_tour_divisions = {
 
 def get_all_tournaments(db):
     tournaments = db.collection(TOURNAMENT_TABLE_DB).order_by("order").stream()
+
     return tournaments
 
 
